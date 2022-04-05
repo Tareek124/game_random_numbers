@@ -7,7 +7,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
@@ -20,13 +19,19 @@ class MyApp extends StatelessWidget {
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
-
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   TextEditingController randomController = TextEditingController();
+
+  int? randomNumber;
+  int? guessedNumber;
+  String textShow = "";
+  int? counter = 0;
+  bool? isWin;
+
   OutlineInputBorder borderDesign(Color color) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
@@ -36,24 +41,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  int? randomNumber;
-  int? guessedNumber;
-  String textShow = "";
-  int? counter = 0;
-
   final _formKey = GlobalKey<FormState>();
-  @override
-  void initState() {
-    super.initState();
-    randomNumber = Random().nextInt(9) + 1;
-  }
-
   guessNumber() {
-    if (counter! < 3) {
+    if (counter! <= 3) {
       if (randomNumber == guessedNumber) {
         setState(() {
           textShow =
-              "تخمينك صحيح الرقم هو $randomNumber لقد نجحت بعد${counter! + 1} محاولة";
+              "تخمينك صحيح الرقم هو $randomNumber لقد نجحت بعد${counter!} محاولة";
+          isWin = true;
         });
       } else {
         if (randomNumber! > guessedNumber!) {
@@ -69,15 +64,29 @@ class _HomePageState extends State<HomePage> {
     } else {
       setState(() {
         textShow = "لقد خسرت حاول مرة اخرى";
+        isWin = false;
       });
     }
   }
 
   Widget myText(String text) {
+    var didWin;
     return Text(text,
         textAlign: TextAlign.center,
-        style: const TextStyle(
-            fontSize: 30, color: Colors.black, fontFamily: "Vazirmatn"));
+        style: TextStyle(
+            fontSize: 30,
+            color: isWin == null
+                ? Colors.black
+                : isWin == false
+                    ? Colors.red
+                    : Colors.cyan,
+            fontFamily: "Vazirmatn"));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    randomNumber = Random().nextInt(9) + 1;
   }
 
   @override
@@ -165,6 +174,7 @@ class _HomePageState extends State<HomePage> {
                           randomNumber = Random().nextInt(9) + 1;
                           counter = 0;
                           randomController.clear();
+                          isWin = null;
                         });
                       },
                       child: const Text(
